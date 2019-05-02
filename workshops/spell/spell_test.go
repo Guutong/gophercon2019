@@ -81,7 +81,7 @@ func loadFile(t *testing.T, file string) string {
 	t.Helper()
 	b, err := ioutil.ReadFile(file)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	return string(b)
 }
