@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-// section: ping
+// // section: ping
 func Ping(req *http.Request, c http.Client) (*http.Response, error) {
 	return c.Do(req)
 }
@@ -16,13 +16,17 @@ func Ping(req *http.Request, c http.Client) (*http.Response, error) {
 // section: template
 type jack struct {
 	// add status code field
-	res string
-	err error
+	code int
+	res  string
+	err  error
 }
 
 func (j jack) RoundTrip(req *http.Request) (*http.Response, error) {
 	res := httptest.NewRecorder()
 	// write status code header, if not 0
+	if j.code != 0 {
+		res.WriteHeader(j.code)
+	}
 	res.Body.WriteString(j.res)
 	return res.Result(), j.err
 }
@@ -35,7 +39,9 @@ func Test_Ping_Status(t *testing.T) {
 
 	exp := 500
 
-	// write client to return 500 status code
+	c := http.Client{
+		Transport: jack{code: exp},
+	}
 
 	res, err := Ping(req, c)
 	if err != nil {

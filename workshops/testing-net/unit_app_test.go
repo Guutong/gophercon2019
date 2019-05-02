@@ -68,15 +68,27 @@ func Test_U_FormHandler(t *testing.T) {
 func Test_U_FormHandler_Template_Error(t *testing.T) {
 
 	// pass invalid hex strings
-	//req := httptest.NewRequest("POST", "/form", strings.NewReader("%zzzzz"))
+	req := httptest.NewRequest("POST", "/form", strings.NewReader("%zzzzz"))
 
 	// set the header `Content-Type` to `application/x-www-form-urlencoded`
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
 	// create a new httptest.NewRecorder
+	res := httptest.NewRecorder()
 
 	// Call the FormHandler
-	// Test to see the the response code is 500
+	FormHandler(res, req)
 
+	// Test to see the the response code is 500
+	if got, exp := res.Code, http.StatusInternalServerError; got != exp {
+		t.Errorf("unexpected response code.  got: %d, exp %d\n", got, exp)
+	}
+
+	// Move to integration test
 	// test the body is `Oops!`
+	// if got, exp := res.Body.String(), "Oops!"; got != exp {
+	// 	t.Errorf("unexpected body: got %s, exp %s\n", got, exp)
+	// }
 }
 
 // section: exercise
@@ -94,9 +106,10 @@ func Test_U_FormHandler_Error(t *testing.T) {
 		t.Errorf("unexpected response code.  got: %d, exp %d\n", got, exp)
 	}
 
-	if got, exp := res.Body.String(), "Oops!"; got != exp {
-		t.Errorf("unexpected body: got %s, exp %s\n", got, exp)
-	}
+	// Move to integration test
+	// if got, exp := res.Body.String(), "Oops!"; got != exp {
+	// 	t.Errorf("unexpected body: got %s, exp %s\n", got, exp)
+	// }
 
 }
 

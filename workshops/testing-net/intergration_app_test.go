@@ -85,13 +85,32 @@ func Test_I_FormHandler(t *testing.T) {
 // section: exercise
 func Test_I_FormHandler_Error_Template(t *testing.T) {
 	// Create a new httptest.NewServer with our App
+	ts := httptest.NewServer(App())
 	// Defer the test server Close
+	defer ts.Close()
 
 	// Post `%zzzz` to the `/form` endpoint
+	res, err := http.Post(ts.URL+"/form",
+		"application/x-www-form-urlencoded",
+		strings.NewReader("%zzzzz"))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	// Test the status code is http.StatusInternalServerError
+	if got, exp := res.StatusCode, http.StatusInternalServerError; got != exp {
+		t.Errorf("unexpected status code: got %d, exp %d\n", got, exp)
+	}
 
 	// test the body is `Oops!`
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got, exp := string(b), "Oops!"; got != exp {
+		t.Errorf("unexpected body: got %s, exp %s\n", got, exp)
+	}
 
 }
 
